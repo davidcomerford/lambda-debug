@@ -13,7 +13,7 @@ jobs:
         python-version: ['3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -29,11 +29,11 @@ jobs:
 
     - name: Create Container from Image
       run: |
-        docker run -platform linux/${{ matrix.architecture }} --rm --volume $(pwd):/tmp pyodbc-mssql-${{ matrix.architecture }} cp /layer.zip /tmp/pyodbc-mssql-python-${{ matrix.python-version }}-${{ matrix.architecture }}.zip
+        docker run --platform linux/${{ matrix.architecture }} --rm --volume $(pwd):/tmp pyodbc-mssql-${{ matrix.architecture }} cp /layer.zip /tmp/pyodbc-mssql-python-${{ matrix.python-version }}-${{ matrix.architecture }}.zip
 
     - name: Run Tests
       run: |
-        docker run -platform linux/${{ matrix.architecture }} -d --name tester --entrypoint tail pyodbc-mssql-${{ matrix.architecture }} -f /dev/null
+        docker run --platform linux/${{ matrix.architecture }} -d --name tester --entrypoint tail pyodbc-mssql-${{ matrix.architecture }} -f /dev/null
         docker cp tests/test_pyodbc.py tester:/tmp
         docker exec tester bash -c "pip install pytest"
         docker exec tester bash -c "pytest /tmp/test_pyodbc.py"
